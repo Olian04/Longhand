@@ -1,0 +1,133 @@
+# GoReleaser: https://goreleaser.com/
+# Run from repo root. Locally: goreleaser check --config goreleaser/.goreleaser.yaml
+#
+# CI sets: APP_BUILD_TIME, RELEASE_NAME, RELEASE_BODY, REGISTRY_IMAGE, PUSH_LATEST, GORELEASER_CURRENT_TAG
+version: 2
+
+project_name: longhand
+
+before:
+  hooks:
+    - go mod download
+
+
+builds:
+  - id: longhand
+    main: github.com/Olian04/Longhand/cmd/longhand
+    binary: longhand
+    dir: .
+    flags:
+      - -trimpath
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s
+      - -w
+      - -X github.com/Olian04/Longhand/cmd/longhand/version.Version={{ .Tag }}
+      - -X github.com/Olian04/Longhand/cmd/longhand/version.Revision={{ .Commit }}
+      - -X github.com/Olian04/Longhand/cmd/longhand/version.BuildTime={{ .Env.APP_BUILD_TIME }}
+
+archives:
+  - id: longhand
+    formats: [binary]
+    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+    ids:
+      - longhand
+
+checksum:
+  name_template: checksums.txt
+
+sboms:
+  - id: longhand
+    artifacts: binary
+    ids:
+      - longhand
+    disable: false
+
+
+changelog:
+  use: git
+  sort: asc
+  abbrev: 7
+  filters:
+    exclude:
+      - "(?i)^merge "
+      - "(?i)^merge pull request"
+      - "^chore\\(release\\):"
+      - "^ci:"
+      - "^docs:"
+
+
+
+release:
+  prerelease: auto
+  name_template: "{{ .Env.RELEASE_NAME }}"
+  header: |
+    {{ .Env.RELEASE_BODY }}
+
+  footer: |
+
+    ## Downloads
+
+    | Asset | Description |
+    |-------|-------------|
+    | `checksums.txt` | SHA256 checksums for all files in this release |
+    | `longhand_*` | Per-OS/arch binaries |
+    | `*.sbom.json` | SPDX JSON SBOM per binary ([Syft](https://github.com/anchore/syft)) |
+
+    Verify after download (Linux/macOS):
+
+    ```bash
+    sha256sum -c checksums.txt
+    ```
+
+    On Windows, verify the printed SHA256 against the file from `checksums.txt` using your preferred tool.
+
+
+
+
+    ## Use as a Go module
+
+    ```bash
+    go get github.com/Olian04/Longhand@{{ .Tag }}
+    ```
+
+    Import from `github.com/Olian04/Longhand/pkg/longhand`.
+
+
+
+    ## Install CLI
+
+    As a Go tool:
+
+    ```bash
+    go get -tool github.com/Olian04/Longhand/cmd/longhand@{{ .Tag }}
+    ```
+
+    Or install globally:
+
+    ```bash
+    go install github.com/Olian04/Longhand/cmd/longhand@{{ .Tag }}
+    ```
+
+
+
+    ## macOS Gatekeeper
+
+    If macOS shows a Gatekeeper warning (“Apple could not verify…”):
+
+    ```bash
+    # Apple Silicon (arm64)
+    xattr -d com.apple.quarantine longhand-darwin-arm64
+
+    # Intel (amd64)
+    xattr -d com.apple.quarantine longhand-darwin-amd64
+    ```
+

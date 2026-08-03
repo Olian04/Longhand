@@ -1,0 +1,10 @@
+# Example YAML config. Load precedence when multiple sources enabled: YAML → ENV → flags.
+labels:
+  service: 'longhand'
+  env: 'local'
+
+logging:
+  level: 'info'
+  format: 'json'
+  # stderr keeps stdout free for command output so results stay pipeable.
+  stream: 'stderr'

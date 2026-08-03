@@ -1,5 +1,36 @@
+# OS
 .DS_Store
-.bootstrap-out/
+Thumbs.db
+
+# Editor / IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment and secrets (example configs stay tracked)
+.env
+.env.local
+.env.*.local
+
+# Go toolchain / workspace (local multi-module checkouts)
+go.work
+go.work.sum
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Test and coverage output
+coverage.*
+*.coverprofile
+profile.cov
+
+# This project (Makefile / GoReleaser)
 dist/
-.smoke*
-tools/bootstrap/.bootstrap-*
+/longhand
