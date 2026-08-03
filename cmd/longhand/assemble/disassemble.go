@@ -8,22 +8,23 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func Assemble() *cli.Command {
+func Disassemble() *cli.Command {
 	return &cli.Command{
-		Name:  "assemble",
-		Usage: "assemble a binary",
+		Name:      "disassemble",
+		Usage:     "disassemble a binary",
+		ArgsUsage: "[arguments...]",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "input",
 				Aliases:  []string{"i"},
 				Usage:    "input file",
-				Required: true,
+				Required: false,
 			},
 			&cli.StringFlag{
 				Name:     "output",
 				Aliases:  []string{"o"},
 				Usage:    "output file",
-				Required: true,
+				Required: false,
 			},
 			&cli.BoolFlag{
 				Name:  "debug",
@@ -31,11 +32,11 @@ func Assemble() *cli.Command {
 				Value: false,
 			},
 		},
-		Action: assembleAction,
+		Action: disassembleAction,
 	}
 }
 
-func assembleAction(ctx context.Context, c *cli.Command) error {
+func disassembleAction(ctx context.Context, c *cli.Command) error {
 	input, err := cli_io.ResolveInputFile(c, "input")
 	if err != nil {
 		return fmt.Errorf("resolve input file: %w", err)

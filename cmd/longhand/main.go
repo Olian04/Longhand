@@ -11,6 +11,7 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"github.com/Olian04/Longhand/cmd/longhand/assemble"
+	"github.com/Olian04/Longhand/cmd/longhand/execute"
 	"github.com/Olian04/Longhand/cmd/longhand/version"
 )
 
@@ -20,12 +21,11 @@ func main() {
 	cli.VersionPrinter = printVersion(vi)
 
 	root := &cli.Command{
-		Name:      "longhand",
-		Usage:     "Echo a message through the domain model",
-		ArgsUsage: "[message...]  (reads stdin when no arguments are given)",
-		Version:   vi.Version,
+		Name:    "longhand",
+		Version: vi.Version,
 		Commands: []*cli.Command{
 			assemble.Assemble(),
+			execute.Execute(),
 		},
 	}
 

@@ -3,15 +3,16 @@ package execute
 import (
 	"context"
 	"fmt"
-	"os"
 
+	"github.com/Olian04/Longhand/cmd/longhand/cli_io"
 	"github.com/urfave/cli/v3"
 )
 
 func Execute() *cli.Command {
 	return &cli.Command{
-		Name:  "execute",
-		Usage: "execute a binary",
+		Name:      "execute",
+		Usage:     "execute a binary",
+		ArgsUsage: "[arguments...]",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "input",
@@ -30,21 +31,17 @@ func Execute() *cli.Command {
 }
 
 func executeAction(ctx context.Context, c *cli.Command) error {
-	input := c.String("input")
-
-	if input == "" {
-		return fmt.Errorf("input is required")
-	}
-
-	binary, err := os.ReadFile(input)
+	input, err := cli_io.ResolveInputFile(c, "input")
 	if err != nil {
-		return fmt.Errorf("read input file: %w", err)
+		return fmt.Errorf("resolve input file: %w", err)
 	}
+	defer input.Close()
+
+	_ = c.Bool("debug")
 
 	// TODO: execute the binary
 	fmt.Println("Executing binary...")
-	fmt.Println("Input file:", input)
-	fmt.Println("Binary:", binary)
+	fmt.Println("Input file:", input.Name())
 
 	return nil
 }
